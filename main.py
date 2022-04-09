@@ -38,11 +38,15 @@ def main():
                     screen.player.walk_y = walk_speed
                 # open or close inventory
                 if event.key == pygame.K_e:
-                    if not screen.player.is_openinventory:
-                        screen.player.is_openinventory = True
-                    else:
+                    screen.player.is_openinventory = not screen.player.is_openinventory
+                # open or close chest
+                if event.key == pygame.K_f:
+                    screen.player.is_interact = not screen.player.is_interact
+                else:
+                    if screen.player.is_interact:
                         screen.player.is_openinventory = False
-                # use item by num_pad
+                    screen.player.is_interact = False
+                    # use item by num_pad
                 for i in range(1, 10):
                     if event.key == eval(f"pygame.K_{i}"):
                         screen.player.selectSlot = i-1

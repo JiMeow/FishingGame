@@ -1,8 +1,6 @@
-from sre_constants import SUCCESS
 import pygame
 import random
 
-from pytest import fail
 from item import Fish, Fishingrod, UsableItem
 from setting import *
 from inventory import Inventory
@@ -65,6 +63,8 @@ class Player(pygame.sprite.Sprite):
         self.success = 120
         # money
         self.money = 0
+        # chest
+        self.is_interact = False
 
     def walkable(self, x, y):
         if self.tile[2][x][y].type == -1:
@@ -357,3 +357,17 @@ class Player(pygame.sprite.Sprite):
         # gameDisplay.blit(name, (mouse_x+15, mouse_y+18))
         gameDisplay.blit(coin, (start_x+9, start_y+8))
         gameDisplay.blit(money, (start_x+30, start_y+9))
+
+    def interact(self):
+        pos_x = self.hitbox.x//50
+        pos_y = self.hitbox.y//50
+        tilearound = []
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if (i != 0 or j != 0):
+                    tilearound += [self.tile[2][pos_x+i][pos_y+j]]
+        for i in tilearound:
+            if i.type == 55:  # open chest
+                i.open()
+                self.openInventory()
+                break

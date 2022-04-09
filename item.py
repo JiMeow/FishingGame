@@ -1,4 +1,3 @@
-from numpy import tile
 import pygame
 import random
 import math
