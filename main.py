@@ -4,7 +4,7 @@ from setting import *
 from player import Player
 from screen import Screen
 from tile_map import Tile, cut_picture, readmap
-# import cProfile as cP
+# import cProfile as cPd
 pygame.init()
 
 
@@ -42,9 +42,13 @@ def main():
                 # open or close chest
                 if event.key == pygame.K_f:
                     screen.player.is_interact = not screen.player.is_interact
-                else:
-                    if screen.player.is_interact:
+                    if not screen.player.is_interact:
+                        screen.player.is_openchest = False
                         screen.player.is_openinventory = False
+                else:
+                    if screen.player.is_openchest:
+                        screen.player.is_openinventory = False
+                    screen.player.is_openchest = False
                     screen.player.is_interact = False
                     # use item by num_pad
                 for i in range(1, 10):
@@ -70,23 +74,34 @@ def main():
                 # use item by mouse
                 if event.button == 4:
                     screen.player.is_useItem = False
-                    if screen.player.selectInventory[0] == 3:
-                        screen.player.selectInventory[1] = screen.player.selectSlot
                     screen.player.selectSlot -= 1
                     screen.player.selectSlot %= 9
-                if event.button == 5:
-                    screen.player.is_useItem = False
                     if screen.player.selectInventory[0] == 3:
                         screen.player.selectInventory[1] = screen.player.selectSlot
+                if event.button == 5:
+                    screen.player.is_useItem = False
                     screen.player.selectSlot += 1
                     screen.player.selectSlot %= 9
+                    if screen.player.selectInventory[0] == 3:
+                        screen.player.selectInventory[1] = screen.player.selectSlot
                 # use item by mouse ans wap by drag mouse and merge LastInventory-Slot
                 if event.button == 1:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     if screen.player.is_fishing:
                         screen.player.rodspeed = -screen.player.rodspeed
+                    if screen.player.is_openchest:
+                        if mouse_x in range(265, 684) and mouse_y in range(265, 475):
+                            screen.player.click = "chest"
+                            screen.player.is_drawItemChest = True
+                            screen.player.selectChest[0] = (
+                                mouse_y-265)//50 % 4
+                            screen.player.selectChest[1] = (
+                                mouse_x-265)//46 % 9
+                        else:
+                            screen.player.is_drawItemChest = False
                     if not screen.player.is_openinventory:
                         if mouse_y in range(860, 895) and mouse_x in range(282, 675):
+                            screen.player.click = "inventory"
                             screen.player.selectSlot = (mouse_x-282)//44 % 9
                             if screen.player.selectInventory[0] == 3:
                                 screen.player.selectInventory[1] = screen.player.selectSlot
@@ -96,6 +111,7 @@ def main():
                                 screen.player.is_useItem = True
                     elif screen.player.is_openinventory:
                         if mouse_x in range(268, 684) and mouse_y in range(563, 763):
+                            screen.player.click = "inventory"
                             screen.player.selectInventory[0] = (
                                 mouse_y-563)//50 % 4
                             screen.player.selectInventory[1] = (
@@ -109,8 +125,15 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP:
                 # swap item by mouse
                 if event.button == 1:
+                    screen.player.is_drawItemChest = False
                     screen.player.is_drawItemInventory = False
                     screen.player.is_drawItemSlot = False
+                    if screen.player.is_openchest:
+                        if screen.player.click == "chest":
+                            screen.player.is_swapchestinventory = True
+                        elif screen.player.click == "inventory":
+                            screen.player.is_swapinventorychest = True
+
                     if screen.player.is_openinventory:
                         screen.player.swapItemInventory()
                     else:

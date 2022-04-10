@@ -1,6 +1,5 @@
 import pygame
 import random
-
 from item import Fish, Fishingrod, UsableItem
 from setting import *
 from inventory import Inventory
@@ -65,13 +64,20 @@ class Player(pygame.sprite.Sprite):
         self.money = 0
         # chest
         self.is_interact = False
+        self.is_openchest = False
+        self.is_drawItemChest = False
+        self.selectChest = [0, 0]
+        self.is_swapchestinventory = False
+        self.is_swapinventorychest = False
+        # click inventory or chest
+        self.click = -1
 
     def walkable(self, x, y):
         if self.tile[2][x][y].type == -1:
             return True
         return False
 
-    def playerCollision(self):
+    def playerCollision(self):  # optimizeable
         ans = 0
         for layer in range(3):
             for i in range(len(self.tile[layer])):
@@ -153,37 +159,40 @@ class Player(pygame.sprite.Sprite):
                         gameDisplay.blit(
                             self.star,  (self.inventory.itemlist[i][j].rect.x-7, self.inventory.itemlist[i][j].rect.y-7))
 
-    def drawItemInventory(self):
+    def drawItemWhenClickInventory(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if self.inventory.itemlist[self.selectInventory[0]][self.selectInventory[1]].id.split('_')[0] != "block":
             gameDisplay.blit(self.inventory.itemlist[self.selectInventory[0]]
                              [self.selectInventory[1]].img, (mouse_x-17.5, mouse_y-17.5))
 
-    def drawItemSlot(self):
+    def drawItemWhenClickSlot(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if self.inventory.itemlist[3][self.selectSlot].id.split('_')[0] != "block":
             gameDisplay.blit(
                 self.inventory.itemlist[3][self.selectSlot].img, (mouse_x-17.5, mouse_y-17.5))
 
     def swapItemInventory(self):
-        before_x, before_y = self.selectInventory[0], self.selectInventory[1]
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        if mouse_x in range(268, 684) and mouse_y in range(563, 763):
-            after_x = (mouse_y-563)//50 % 4
-            after_y = (mouse_x-268)//46 % 9
-            self.inventory.itemlist[before_x][before_y], self.inventory.itemlist[after_x][
-                after_y] = self.inventory.itemlist[after_x][after_y], self.inventory.itemlist[before_x][before_y]
-            self.inventory.itemlist[before_x][before_y].rect, self.inventory.itemlist[after_x][
-                after_y].rect = self.inventory.itemlist[after_x][after_y].rect, self.inventory.itemlist[before_x][before_y].rect
-            self.selectInventory = [after_x, after_y]
-            if self.selectInventory[0] == 3:
-                self.selectSlot = after_y
-        else:
-            return
+        if self.click == "inventory":
+            before_x, before_y = self.selectInventory[0], self.selectInventory[1]
+            if self.inventory.itemlist[before_x][before_y].type == "block":
+                return
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            if mouse_x in range(268, 684) and mouse_y in range(563, 763):
+                after_x = (mouse_y-563)//50 % 4
+                after_y = (mouse_x-268)//46 % 9
+                self.inventory.itemlist[before_x][before_y], self.inventory.itemlist[after_x][
+                    after_y] = self.inventory.itemlist[after_x][after_y], self.inventory.itemlist[before_x][before_y]
+                self.inventory.itemlist[before_x][before_y].rect, self.inventory.itemlist[after_x][
+                    after_y].rect = self.inventory.itemlist[after_x][after_y].rect, self.inventory.itemlist[before_x][before_y].rect
+                self.selectInventory = [after_x, after_y]
+                if self.selectInventory[0] == 3:
+                    self.selectSlot = after_y
 
     def swapItemSlot(self):
         before = self.selectSlot
         mouse_x, mouse_y = pygame.mouse.get_pos()
+        if self.inventory.itemlist[3][before].type == "block":
+            return
         if mouse_y in range(860, 895) and mouse_x in range(282, 675):
             after = (mouse_x-282)//44 % 9
             self.inventory.itemlist[3][before].type, self.inventory.itemlist[3][
@@ -222,18 +231,31 @@ class Player(pygame.sprite.Sprite):
                     self.itemlist[i][j] = f"fish_{i*9+j+1}"
 
     def drawItem(self):
-        if self.is_openinventory:
+        if self.is_openchest:
+            self.openInventory()
+        elif self.is_openinventory:
             # draw inventory
             self.openInventory()
+        else:
+            # draw item slot
+            self.openItemslot()
+        self.drawItemOnHand()
+
+    def drawItemClickAndOnHand(self):
+        if self.is_openchest:
+            if self.is_drawItemInventory:
+                self.drawItemWhenClickInventory()
+        elif self.is_openinventory:
+            # draw inventory
             if self.is_drawItemInventory:
                 # draw item in inventory on mouse
-                self.drawItemInventory()
+                self.drawItemWhenClickInventory()
         else:
             # draw item slot
             self.openItemslot()
             if self.is_drawItemSlot:
                 # draw item in slot on mouse
-                self.drawItemSlot()
+                self.drawItemWhenClickSlot()
         self.drawItemOnHand()
 
     def checkItemDetail(self):
@@ -328,7 +350,7 @@ class Player(pygame.sprite.Sprite):
 
     def giveRandomFish(self):
         giveAt = (-1, -1)
-        for i in range(3, -1, -1):
+        for i in [3, 0, 1, 2]:
             if giveAt != (-1, -1):
                 break
             for j in range(len(self.inventory.itemlist[i])):
@@ -366,8 +388,33 @@ class Player(pygame.sprite.Sprite):
             for j in range(-1, 2):
                 if (i != 0 or j != 0):
                     tilearound += [self.tile[2][pos_x+i][pos_y+j]]
+        found = 0
         for i in tilearound:
             if i.type == 55:  # open chest
+                found = 1
+                self.is_openchest = True
+                self.is_openinventory = True
                 i.open()
-                self.openInventory()
+                if self.is_drawItemChest:
+                    i.draw(self.selectChest[0], self.selectChest[1])
+                if self.checkDetail:
+                    i.checkItemDetail()
+                if self.is_swapchestinventory:
+                    i.swapItemChest(
+                        self.selectChest[0], self.selectChest[1], self.inventory)
+                    self.is_swapchestinventory = False
+                    i.swapItemChestInventory(
+                        self.selectChest[0], self.selectChest[1], self.inventory)
+                    self.is_swapchestinventory = False
+                if self.is_swapinventorychest:
+                    i.swapItemInventoryChest(
+                        self.selectInventory[0], self.selectInventory[1], self.inventory)
+                    self.is_swapinventorychest = False
+
+                # self.openInventory()
                 break
+
+        if found == 0:
+            self.is_openinventory = False
+            self.is_openchest = False
+            self.is_interact = False

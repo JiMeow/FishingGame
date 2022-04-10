@@ -110,9 +110,10 @@ class Screen():
                              * 50-self.player.rect.y % 50, (now_x+4-(now_x+2-fov//2))*50-self.player.rect.x % 50))
         else:
             self.player.draw()
+        self.player.drawItem()
         if self.player.is_interact:
             self.player.interact()
-        self.player.drawItem()
+        self.player.drawItemClickAndOnHand()
         if self.player.checkDetail:
             self.player.checkItemDetail()
         if self.player.is_useItem:
