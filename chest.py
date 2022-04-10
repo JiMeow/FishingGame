@@ -45,7 +45,6 @@ class Chest(Tile):
             select_y = (mouse_x-265)//46 % 9
         else:
             return
-
         type = self.inventory.itemlist[select_x][select_y].id.split('_')[0]
         if type == "fish":
             font = pygame.font.Font('font/freesansbold.ttf', 15)

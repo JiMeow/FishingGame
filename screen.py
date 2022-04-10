@@ -111,9 +111,10 @@ class Screen():
         else:
             self.player.draw()
         self.player.drawItem()
+        self.player.drawItemOnHand()
         if self.player.is_interact:
             self.player.interact()
-        self.player.drawItemClickAndOnHand()
+        self.player.drawItemClick()
         if self.player.checkDetail:
             self.player.checkItemDetail()
         if self.player.is_useItem:

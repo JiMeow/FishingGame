@@ -239,9 +239,9 @@ class Player(pygame.sprite.Sprite):
         else:
             # draw item slot
             self.openItemslot()
-        self.drawItemOnHand()
+        # self.drawItemOnHand()
 
-    def drawItemClickAndOnHand(self):
+    def drawItemClick(self):
         if self.is_openchest:
             if self.is_drawItemInventory:
                 self.drawItemWhenClickInventory()
@@ -256,7 +256,6 @@ class Player(pygame.sprite.Sprite):
             if self.is_drawItemSlot:
                 # draw item in slot on mouse
                 self.drawItemWhenClickSlot()
-        self.drawItemOnHand()
 
     def checkItemDetail(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
