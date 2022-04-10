@@ -62,15 +62,22 @@ class Player(pygame.sprite.Sprite):
         self.success = 120
         # money
         self.money = 0
-        # chest
+        # interact
         self.is_interact = False
+        # click inventory or chest or shop
+        self.click = -1
+        # chest
         self.is_openchest = False
         self.is_drawItemChest = False
         self.selectChest = [0, 0]
         self.is_swapchestinventory = False
         self.is_swapinventorychest = False
-        # click inventory or chest
-        self.click = -1
+        # shop
+        self.is_sell = False
+        self.is_openshop = False
+        self.is_drawItemShop = False
+        self.is_swapshopinventory = False
+        self.is_swapinventoryshop = False
 
     def walkable(self, x, y):
         if self.tile[2][x][y].type == -1:
@@ -239,7 +246,6 @@ class Player(pygame.sprite.Sprite):
         else:
             # draw item slot
             self.openItemslot()
-        # self.drawItemOnHand()
 
     def drawItemClick(self):
         if self.is_openchest:
@@ -388,32 +394,55 @@ class Player(pygame.sprite.Sprite):
                 if (i != 0 or j != 0):
                     tilearound += [self.tile[2][pos_x+i][pos_y+j]]
         found = 0
-        for i in tilearound:
-            if i.type == 55:  # open chest
+        for tile in tilearound:
+            if tile.type == 55:  # open chest
+                chest = tile
                 found = 1
                 self.is_openchest = True
                 self.is_openinventory = True
-                i.open()
+                chest.open()
                 if self.is_drawItemChest:
-                    i.draw(self.selectChest[0], self.selectChest[1])
+                    chest.draw(self.selectChest[0], self.selectChest[1])
                 if self.checkDetail:
-                    i.checkItemDetail()
+                    chest.checkItemDetail()
                 if self.is_swapchestinventory:
-                    i.swapItemChest(
+                    chest.swapItemChest(
                         self.selectChest[0], self.selectChest[1], self.inventory)
                     self.is_swapchestinventory = False
-                    i.swapItemChestInventory(
+                    chest.swapItemChestInventory(
                         self.selectChest[0], self.selectChest[1], self.inventory)
                     self.is_swapchestinventory = False
                 if self.is_swapinventorychest:
-                    i.swapItemInventoryChest(
+                    chest.swapItemInventoryChest(
                         self.selectInventory[0], self.selectInventory[1], self.inventory)
                     self.is_swapinventorychest = False
+                break
 
-                # self.openInventory()
+            if tile.type == 293:  # open shop
+                shop = tile
+                found = 1
+                self.is_openinventory = True
+                self.is_openshop = True
+                shop.open()
+                if self.checkDetail:
+                    self.checkItemDetail()
+                if self.is_drawItemShop:
+                    shop.drawItemWhenClickShop()
+                if self.is_swapshopinventory:
+                    shop.swapItemShopInventory(
+                        self.selectChest[0], self.selectChest[1], self.inventory)
+                    self.is_swapshopinventory = False
+                if self.is_swapinventoryshop:
+                    shop.swapItemInventoryShop(
+                        self.selectInventory[0], self.selectInventory[1], self.inventory)
+                    self.is_swapinventoryshop = False
+                if self.is_sell:
+                    self.money += shop.sell()
+                    self.is_sell = False
                 break
 
         if found == 0:
             self.is_openinventory = False
+            self.is_openshop = False
             self.is_openchest = False
             self.is_interact = False

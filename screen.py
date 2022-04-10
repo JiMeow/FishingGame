@@ -5,6 +5,7 @@ from setting import *
 from player import Player
 from tile_map import Tile, cut_picture
 from chest import Chest
+from shop import Shop
 
 dic = {50: 'bush',
        161: 'grass',
@@ -46,6 +47,8 @@ class Screen():
                 for j in range(len(tilelist[k][0])):
                     if tilelist[k][i][j] == 55:
                         tile = Chest(tilelist[k][i][j])
+                    elif tilelist[k][i][j] == 293:
+                        tile = Shop(tilelist[k][i][j])
                     else:
                         tile = Tile(tilelist[k][i][j])
                     tile.rect.x = i*50

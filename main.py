@@ -43,11 +43,13 @@ def main():
                 if event.key == pygame.K_f:
                     screen.player.is_interact = not screen.player.is_interact
                     if not screen.player.is_interact:
+                        screen.player.is_openshop = False
                         screen.player.is_openchest = False
                         screen.player.is_openinventory = False
                 else:
-                    if screen.player.is_openchest:
+                    if screen.player.is_openchest or screen.player.is_openshop:
                         screen.player.is_openinventory = False
+                    screen.player.is_openshop = False
                     screen.player.is_openchest = False
                     screen.player.is_interact = False
                     # use item by num_pad
@@ -89,6 +91,16 @@ def main():
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     if screen.player.is_fishing:
                         screen.player.rodspeed = -screen.player.rodspeed
+                    if screen.player.is_openshop:
+                        if mouse_x in range(425, 475) and mouse_y in range(450, 500):
+                            screen.player.click = "shop"
+                            screen.player.is_drawItemShop = True
+                        elif mouse_x in range(525, 575) and mouse_y in range(450, 500):
+                            screen.player.click = "shop"
+                            screen.player.is_sell = True
+                            screen.player.is_drawItemShop = False
+                        else:
+                            screen.player.is_drawItemShop = False
                     if screen.player.is_openchest:
                         if mouse_x in range(265, 684) and mouse_y in range(265, 475):
                             screen.player.click = "chest"
@@ -120,14 +132,21 @@ def main():
                                 screen.player.selectSlot = screen.player.selectInventory[1]
                             screen.player.is_drawItemInventory = True
                         else:
-                            screen.player.is_openinventory = False
+                            if not (screen.player.is_openchest or screen.player.is_openshop):
+                                screen.player.is_openinventory = False
 
             if event.type == pygame.MOUSEBUTTONUP:
                 # swap item by mouse
                 if event.button == 1:
                     screen.player.is_drawItemChest = False
                     screen.player.is_drawItemInventory = False
+                    screen.player.is_drawItemShop = False
                     screen.player.is_drawItemSlot = False
+                    if screen.player.is_openshop:
+                        if screen.player.click == "shop":
+                            screen.player.is_swapshopinventory = True
+                        elif screen.player.click == "inventory":
+                            screen.player.is_swapinventoryshop = True
                     if screen.player.is_openchest:
                         if screen.player.click == "chest":
                             screen.player.is_swapchestinventory = True
@@ -138,6 +157,7 @@ def main():
                         screen.player.swapItemInventory()
                     else:
                         screen.player.swapItemSlot()
+
                     screen.player.rodspeed = -abs(screen.player.rodspeed)
             else:
                 # look detail
