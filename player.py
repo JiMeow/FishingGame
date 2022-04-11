@@ -11,16 +11,17 @@ class Player(pygame.sprite.Sprite):
         self.tile = tile
         self.animate = 0
         # player
-        self.player = pygame.transform.scale(
-            pygame.image.load('photo/player.png'), (100, 100))
+        self.lasswalkclick = "s"
+        self.playerFrame = 10
+        self.setAnimateFromLastClick()
+        self.playerup = pygame.transform.scale(
+            pygame.image.load(f'animation/walkup/{self.animate//self.playerFrame%4}.png'), (90, 90))
         self.playerright = pygame.transform.scale(
-            pygame.image.load('photo/playerright.png'), (100, 100))
+            pygame.image.load(f'animation/walkright/{self.animate//self.playerFrame%4}.png'), (90, 90))
         self.playerleft = pygame.transform.scale(
-            pygame.image.load('photo/playerleft.png'), (100, 100))
-        self.playerupleft = pygame.transform.scale(
-            pygame.image.load('photo/playerupleft.png'), (100, 100))
-        self.playerupright = pygame.transform.scale(
-            pygame.image.load('photo/playerupright.png'), (100, 100))
+            pygame.image.load(f'animation/walkleft/{self.animate//self.playerFrame%4}.png'), (90, 90))
+        self.playerdown = pygame.transform.scale(
+            pygame.image.load(f'animation/walkdown/{self.animate//self.playerFrame%4}.png'), (90, 90))
         self.rect = self.playerright.get_rect()
         self.rect.x = display_width//2-500
         self.rect.y = display_height//2-500
@@ -79,6 +80,20 @@ class Player(pygame.sprite.Sprite):
         self.is_swapshopinventory = False
         self.is_swapinventoryshop = False
 
+    def setAnimateFromLastClick(self):
+        if self.lasswalkclick == "s":
+            self.player = pygame.transform.scale(
+                pygame.image.load(f'animation/walkdown/0.png'), (90, 90))
+        if self.lasswalkclick == "d":
+            self.player = pygame.transform.scale(
+                pygame.image.load(f'animation/walkright/0.png'), (90, 90))
+        if self.lasswalkclick == "w":
+            self.player = pygame.transform.scale(
+                pygame.image.load(f'animation/walkup/0.png'), (90, 90))
+        if self.lasswalkclick == "a":
+            self.player = pygame.transform.scale(
+                pygame.image.load(f'animation/walkleft/0.png'), (90, 90))
+
     def walkable(self, x, y):
         if self.tile[2][x][y].type == -1:
             return True
@@ -109,13 +124,22 @@ class Player(pygame.sprite.Sprite):
             self.hitbox = pygame.Rect(self.rect.x+60, self.rect.y+50, 1, 1)
 
     def draw(self):
+        self.setAnimateFromLastClick()
+        self.playerup = pygame.transform.scale(
+            pygame.image.load(f'animation/walkup/{self.animate//self.playerFrame%4}.png'), (90, 90))
+        self.playerright = pygame.transform.scale(
+            pygame.image.load(f'animation/walkright/{self.animate//self.playerFrame%4}.png'), (90, 90))
+        self.playerleft = pygame.transform.scale(
+            pygame.image.load(f'animation/walkleft/{self.animate//self.playerFrame%4}.png'), (90, 90))
+        self.playerdown = pygame.transform.scale(
+            pygame.image.load(f'animation/walkdown/{self.animate//self.playerFrame%4}.png'), (90, 90))
         if self.walk_x == 0 and self.walk_y == 0:
             gameDisplay.blit(self.player, (fov//2*50, fov//2*50))
         elif self.walk_y == 0:
             if self.walk_x >= 0:
-                gameDisplay.blit(self.playerupright, (fov//2*50, fov//2*50))
+                gameDisplay.blit(self.playerdown, (fov//2*50, fov//2*50))
             elif self.walk_x < 0:
-                gameDisplay.blit(self.player, (fov//2*50, fov//2*50))
+                gameDisplay.blit(self.playerup, (fov//2*50, fov//2*50))
         elif self.walk_x < 0:
             if self.walk_y > 0:
                 gameDisplay.blit(self.playerright, (fov//2*50, fov//2*50))
@@ -213,20 +237,27 @@ class Player(pygame.sprite.Sprite):
             return
 
     def drawItemOnHand(self):
-        if self.walk_x == 0 and self.walk_y == 0 or self.walk_x < 0 and self.walk_y == 0:
+        if self.walk_x == 0 and self.walk_y == 0:
             if self.inventory.itemlist[3][self.selectSlot].id.split('_')[0] != "block":
                 img = pygame.transform.scale(
                     self.inventory.itemlist[3][self.selectSlot].img, (50, 50))
                 if self.inventory.itemlist[3][self.selectSlot].id.split('_')[0] == "fishingrod":
                     img = pygame.transform.scale(
-                        self.inventory.itemlist[3][self.selectSlot].img, (60, 60))
+                        self.inventory.itemlist[3][self.selectSlot].img, (50, 50))
                 if self.inventory.itemlist[3][self.selectSlot].id.split('_')[0] == "fish":
                     img = pygame.transform.scale(
                         self.inventory.itemlist[3][self.selectSlot].img, (40, 40))
                 img.set_colorkey("white")
                 if self.inventory.itemlist[3][self.selectSlot].id[:5] == "fish_":
                     img.set_colorkey("black")
-                gameDisplay.blit(img, (fov//2*50+60, fov//2*50+27))
+                if self.lasswalkclick == "s":
+                    gameDisplay.blit(img, (fov//2*50+50, fov//2*50+40))
+                if self.lasswalkclick == "d":
+                    gameDisplay.blit(img, (fov//2*50+15, fov//2*50+60))
+                if self.lasswalkclick == "w":
+                    gameDisplay.blit(img, (fov//2*50, fov//2*50+40))
+                if self.lasswalkclick == "a":
+                    gameDisplay.blit(img, (fov//2*50+15, fov//2*50+60))
 
     def setItemInventory(self):
         self.itemlist[3][0] = "fish_1"
