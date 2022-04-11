@@ -30,16 +30,16 @@ def main():
                     walk_speed *= 2
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     screen.player.walk_x = -walk_speed
-                    screen.player.lasswalkclick = "w"
+                    screen.player.lastwalkclick = "w"
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     screen.player.walk_y = -walk_speed
-                    screen.player.lasswalkclick = "a"
+                    screen.player.lastwalkclick = "a"
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     screen.player.walk_x = walk_speed
-                    screen.player.lasswalkclick = "s"
+                    screen.player.lastwalkclick = "s"
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     screen.player.walk_y = walk_speed
-                    screen.player.lasswalkclick = "d"
+                    screen.player.lastwalkclick = "d"
                 # open or close inventory
                 if event.key == pygame.K_e:
                     screen.player.is_openinventory = not screen.player.is_openinventory
