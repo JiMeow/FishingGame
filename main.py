@@ -27,7 +27,9 @@ def main():
                 if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
                     screen.player.walk_x *= 2
                     screen.player.walk_y *= 2
+                    screen.player.is_shift = True
                     walk_speed *= 2
+
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     screen.player.walk_x = -walk_speed
                     screen.player.lastwalkclick = "w"
@@ -67,6 +69,7 @@ def main():
                     screen.player.walk_x //= 2
                     screen.player.walk_y //= 2
                     walk_speed //= 2
+                    screen.player.is_shift = False
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     screen.player.walk_x = 0
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:

@@ -4,6 +4,7 @@
         "Junonia",
         "KEYUP",
         "MOUSEBUTTONUP",
+        "playerup",
         "playerupleft"
     ]
 }

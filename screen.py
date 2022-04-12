@@ -97,20 +97,23 @@ class Screen():
         if self.tile[2][now_x+2][now_y+1].type != -1:
             self.player.draw()
             layer = 2
+            while(self.tile[layer][now_x+2][now_y].type == -1):
+                layer -= 1
+            if layer == 2 and self.tile[2][now_x+2][now_y].type != 257 and self.tile[2][now_x+2][now_y].type != 192 and self.tile[2][now_x+2][now_y].type != 193:
+                gameDisplay.blit(self.tile[layer][now_x+2][now_y].img, ((now_y+1-(now_y+1-fov//2))
+                                                                        * 50-self.player.rect.y % 50, (now_x+4-(now_x+2-fov//2))*50-self.player.rect.x % 50))
+            layer = 2
             while(self.tile[layer][now_x+2][now_y+1].type == -1):
                 layer -= 1
-            gameDisplay.blit(self.tile[layer][now_x+2][now_y+1].img, ((now_y+2-(now_y+1-fov//2))
-                             * 50-self.player.rect.y % 50, (now_x+4-(now_x+2-fov//2))*50-self.player.rect.x % 50))
+            if layer == 2 and self.tile[2][now_x+2][now_y+1].type != 257 and self.tile[2][now_x+2][now_y+1].type != 192 and self.tile[2][now_x+2][now_y+1].type != 193:
+                gameDisplay.blit(self.tile[layer][now_x+2][now_y+1].img, ((now_y+2-(now_y+1-fov//2))
+                                                                          * 50-self.player.rect.y % 50, (now_x+4-(now_x+2-fov//2))*50-self.player.rect.x % 50))
             layer = 2
             while(self.tile[layer][now_x+2][now_y+2].type == -1):
                 layer -= 1
-            gameDisplay.blit(self.tile[layer][now_x+2][now_y+2].img, ((now_y+3-(now_y+1-fov//2))
-                             * 50-self.player.rect.y % 50, (now_x+4-(now_x+2-fov//2))*50-self.player.rect.x % 50))
-            layer = 2
-            while(self.tile[layer][now_x+2][now_y].type == -1):
-                layer -= 1
-            gameDisplay.blit(self.tile[layer][now_x+2][now_y].img, ((now_y+1-(now_y+1-fov//2))
-                             * 50-self.player.rect.y % 50, (now_x+4-(now_x+2-fov//2))*50-self.player.rect.x % 50))
+            if layer == 2 and self.tile[2][now_x+2][now_y+2].type != 257 and self.tile[2][now_x+2][now_y+2].type != 192 and self.tile[2][now_x+2][now_y+2].type != 193:
+                gameDisplay.blit(self.tile[layer][now_x+2][now_y+2].img, ((now_y+3-(now_y+1-fov//2))
+                                                                          * 50-self.player.rect.y % 50, (now_x+4-(now_x+2-fov//2))*50-self.player.rect.x % 50))
         else:
             self.player.draw()
         self.player.drawItem()

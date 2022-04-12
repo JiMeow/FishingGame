@@ -65,6 +65,7 @@ class Player(pygame.sprite.Sprite):
         self.money = 0
         # interact
         self.is_interact = False
+        self.is_shift = False
         # click inventory or chest or shop
         self.click = -1
         # chest
@@ -125,14 +126,24 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self):
         self.setAnimateFromLastClick()
-        self.playerup = pygame.transform.scale(
-            pygame.image.load(f'animation/walkup/{self.animate//self.playerFrame%4}.png'), (90, 90))
-        self.playerright = pygame.transform.scale(
-            pygame.image.load(f'animation/walkright/{self.animate//self.playerFrame%4}.png'), (90, 90))
-        self.playerleft = pygame.transform.scale(
-            pygame.image.load(f'animation/walkleft/{self.animate//self.playerFrame%4}.png'), (90, 90))
-        self.playerdown = pygame.transform.scale(
-            pygame.image.load(f'animation/walkdown/{self.animate//self.playerFrame%4}.png'), (90, 90))
+        if self.is_shift:
+            self.playerup = pygame.transform.scale(
+                pygame.image.load(f'animation/walkup/{self.animate*2//self.playerFrame%4}.png'), (90, 90))
+            self.playerright = pygame.transform.scale(
+                pygame.image.load(f'animation/walkright/{self.animate*2//self.playerFrame%4}.png'), (90, 90))
+            self.playerleft = pygame.transform.scale(
+                pygame.image.load(f'animation/walkleft/{self.animate*2//self.playerFrame%4}.png'), (90, 90))
+            self.playerdown = pygame.transform.scale(
+                pygame.image.load(f'animation/walkdown/{self.animate*2//self.playerFrame%4}.png'), (90, 90))
+        else:
+            self.playerup = pygame.transform.scale(
+                pygame.image.load(f'animation/walkup/{self.animate//self.playerFrame%4}.png'), (90, 90))
+            self.playerright = pygame.transform.scale(
+                pygame.image.load(f'animation/walkright/{self.animate//self.playerFrame%4}.png'), (90, 90))
+            self.playerleft = pygame.transform.scale(
+                pygame.image.load(f'animation/walkleft/{self.animate//self.playerFrame%4}.png'), (90, 90))
+            self.playerdown = pygame.transform.scale(
+                pygame.image.load(f'animation/walkdown/{self.animate//self.playerFrame%4}.png'), (90, 90))
         if self.walk_x == 0 and self.walk_y == 0:
             if self.lastwalkclick == "w":
                 self.drawItemOnHand()
